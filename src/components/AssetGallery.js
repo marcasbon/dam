@@ -44,8 +44,8 @@ const AssetGallery = ({ onSelectAsset }) => {
 
   return (
     <div>
-      <h1>Asset Gallery</h1>
-      <button onClick={() => navigate('/upload')}>Upload New Asset</button>
+      <h1>Galeria de archivos</h1>
+      <button onClick={() => navigate('/upload')}>Subir archivo</button>
       <div className="gallery">
         {assets.map((asset) => (
           <div key={asset.name} className="asset-item" onClick={() => handleSelectAsset(asset)}>

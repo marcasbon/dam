@@ -22,11 +22,10 @@ const AssetDetails = ({ asset }) => {
 
   return (
     <div className="asset-details">
-      <h1>Asset Details</h1>
-      {/* <img src={asset.url} alt={asset.name} /> */}
+      <h1>Detalles del archivo</h1>
       <p>{asset.name}</p>
-      <button onClick={handleDelete}>Delete Asset</button>
-      <button onClick={() => navigate('/gallery')}>Back to Gallery</button>
+      <button onClick={handleDelete}>Borrar</button>
+      <button onClick={() => navigate('/gallery')}>Atras</button>
     </div>
   );
 };
