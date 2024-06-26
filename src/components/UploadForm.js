@@ -1,11 +1,13 @@
 // src/components/UploadForm.js
 import React, { useState } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { useNavigate } from 'react-router-dom';
 
 const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleUpload = () => {
     if (!file) return;
@@ -36,6 +38,7 @@ const UploadForm = () => {
       <button onClick={handleUpload}>Upload</button>
       <div>Progress: {progress}%</div>
       {message && <p>{message}</p>}
+      <button onClick={() => navigate('/gallery')}>Go to Asset Gallery</button>
     </div>
   );
 };
