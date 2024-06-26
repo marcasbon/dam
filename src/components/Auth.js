@@ -54,7 +54,7 @@ const Auth = () => {
       />
       <button onClick={handleAuth}>{isRegister ? 'Registrarse' : 'Iniciar Sesión'}</button>
       <button onClick={() => setIsRegister(!isRegister)}>
-        {isRegister ? 'Cambiar a Iniciar Sesión' : 'Cambiar a Registrarse'}
+        {isRegister ? 'Iniciar Sesión' : 'Registrarse'}
       </button>
       {error && <p>{error}</p>}
     </div>

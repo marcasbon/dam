@@ -33,3 +33,17 @@
     color: #333;
     word-wrap: break-word;
 }
+
+button {
+    background-color: #007BFF; /* Bootstrap blue */
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

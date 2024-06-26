@@ -1,4 +1,3 @@
-// src/components/UploadForm.js
 import React, { useState, useCallback } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
@@ -9,22 +8,30 @@ import './UploadForm.css';
 const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
+  const [isImage, setIsImage] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
+  const [downloadURL, setDownloadURL] = useState("");
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageSrc(reader.result);
-    };
-    reader.readAsDataURL(selectedFile);
+    if (selectedFile.type.startsWith('image/')) {
+      setIsImage(true);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageSrc(reader.result);
+      };
+      reader.readAsDataURL(selectedFile);
+    } else {
+      setIsImage(false);
+      setImageSrc(null);
+    }
   };
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
@@ -69,10 +76,15 @@ const UploadForm = () => {
 
   const handleUpload = async () => {
     if (!file) return;
-    const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+    let fileToUpload = file;
+
+    if (isImage) {
+      fileToUpload = await getCroppedImg(imageSrc, croppedAreaPixels);
+    }
+
     const storage = getStorage();
     const storageRef = ref(storage, `uploads/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
+    const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
 
     uploadTask.on('state_changed',
       (snapshot) => {
@@ -84,17 +96,27 @@ const UploadForm = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setMessage(`File uploaded successfully! URL: ${downloadURL}`);
+          setDownloadURL(downloadURL);
+          setMessage(`File uploaded successfully!`);
         });
       }
     );
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(downloadURL);
+    alert('Download link copied to clipboard!');
+  };
+
+  const getEmbedCode = () => {
+    return `<iframe src="${downloadURL}" width="600" height="400"></iframe>`;
   };
 
   return (
     <div className="upload-form">
       <h1>Subir nuevo archivo</h1>
       <input type="file" onChange={handleFileChange} />
-      {imageSrc && (
+      {isImage && imageSrc && (
         <div className="crop-container">
           <Cropper
             image={imageSrc}
@@ -120,6 +142,15 @@ const UploadForm = () => {
       <button onClick={handleUpload}>Subir</button>
       <div className="progress">Progreso: {progress}%</div>
       {message && <p className="message">{message}</p>}
+      {downloadURL && (
+        <div className="links">
+          <button onClick={handleCopyLink}>Copiar enlace de descarga</button>
+          <div>
+            <label>Código de inserción:</label>
+            <textarea readOnly value={getEmbedCode()} />
+          </div>
+        </div>
+      )}
       <button onClick={() => navigate('/gallery')}>Ir a la galeria</button>
     </div>
   );

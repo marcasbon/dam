@@ -26,7 +26,7 @@ const AssetGallery = ({ onSelectAsset }) => {
         index === self.findIndex((t) => t.name === asset.name)
       );
 
-      setAssets(uniqueAssets);
+      setAssets(assetObjects);
     };
 
     fetchAssets();
