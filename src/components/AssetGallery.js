@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-
+import './AssetGallery.css';
 
 const AssetGallery = ({ onSelectAsset }) => {
   const [assets, setAssets] = useState([]);
@@ -12,11 +12,8 @@ const AssetGallery = ({ onSelectAsset }) => {
     const fetchAssets = async () => {
       const storage = getStorage();
       const listRef = ref(storage, 'uploads/');
-      
-      // Limpiar la lista de activos antes de agregar nuevos
-      setAssets([]);
-      
       const res = await listAll(listRef);
+
       const assetPromises = res.items.map(async (itemRef) => {
         const url = await getDownloadURL(itemRef);
         return { name: itemRef.name, url };
@@ -40,6 +37,11 @@ const AssetGallery = ({ onSelectAsset }) => {
     navigate('/details');
   };
 
+  const isImage = (fileName) => {
+    const extension = fileName.split('.').pop().toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif'].includes(extension);
+  };
+
   return (
     <div>
       <h1>Asset Gallery</h1>
@@ -47,8 +49,11 @@ const AssetGallery = ({ onSelectAsset }) => {
       <div className="gallery">
         {assets.map((asset) => (
           <div key={asset.name} className="asset-item" onClick={() => handleSelectAsset(asset)}>
-            <img src={asset.url} alt={asset.name} />
-            <p>{asset.name}</p>
+            {isImage(asset.name) ? (
+              <img src={asset.url} alt={asset.name} />
+            ) : (
+              <p>{asset.name}</p>
+            )}
           </div>
         ))}
       </div>

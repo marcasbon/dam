@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
+import './AssetDetails.css';
 
 const AssetDetails = ({ asset }) => {
   const navigate = useNavigate();
@@ -20,9 +21,9 @@ const AssetDetails = ({ asset }) => {
   };
 
   return (
-    <div>
+    <div className="asset-details">
       <h1>Asset Details</h1>
-      <img src={asset.url} alt={asset.name} style={{ maxWidth: '100%', height: 'auto' }} />
+      {/* <img src={asset.url} alt={asset.name} /> */}
       <p>{asset.name}</p>
       <button onClick={handleDelete}>Delete Asset</button>
       <button onClick={() => navigate('/gallery')}>Back to Gallery</button>

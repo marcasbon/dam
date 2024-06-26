@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
+import './UploadForm.css';
 
 const UploadForm = () => {
   const [file, setFile] = useState(null);
@@ -32,12 +33,12 @@ const UploadForm = () => {
   };
 
   return (
-    <div>
+    <div className="upload-form">
       <h1>Upload New Asset</h1>
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <button onClick={handleUpload}>Upload</button>
-      <div>Progress: {progress}%</div>
-      {message && <p>{message}</p>}
+      <div className="progress">Progress: {progress}%</div>
+      {message && <p className="message">{message}</p>}
       <button onClick={() => navigate('/gallery')}>Go to Asset Gallery</button>
     </div>
   );

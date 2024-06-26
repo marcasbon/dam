@@ -1,0 +1,35 @@
+/* src/components/AssetGallery.css */
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.asset-item {
+    width: 200px;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.asset-item:hover {
+    transform: scale(1.05);
+}
+
+.asset-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.asset-item p {
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+}

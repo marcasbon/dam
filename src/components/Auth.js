@@ -1,5 +1,7 @@
+// src/components/Auth.js
 import React, { useState } from 'react';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import './Auth.css';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +38,7 @@ const Auth = () => {
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h1>{isRegister ? 'Registrarse' : 'Iniciar Sesión'}</h1>
       <input
         type="email"
@@ -54,7 +56,7 @@ const Auth = () => {
       <button onClick={() => setIsRegister(!isRegister)}>
         {isRegister ? 'Cambiar a Iniciar Sesión' : 'Cambiar a Registrarse'}
       </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p>{error}</p>}
     </div>
   );
 };
