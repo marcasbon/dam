@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getStorage, ref, deleteObject, getMetadata } from 'firebase/storage';
+import { getAuth } from 'firebase/auth'; // Importar Firebase Auth
 import './AssetDetails.css';
 
 const AssetDetails = () => {
@@ -30,14 +31,21 @@ const AssetDetails = () => {
   }
 
   const handleDelete = async () => {
-    const assetRef = ref(storage, `uploads/${asset.name}`);
-    try {
-      await deleteObject(assetRef);
-      alert('Asset deleted successfully');
-      navigate('/gallery');
-    } catch (error) {
-      console.error('Error deleting asset:', error);
-      alert('Error deleting asset');
+    const auth = getAuth(); // Obtener instancia de autenticación
+    const user = auth.currentUser;
+
+    if (user && user.email === 'admin@admin.com') {
+      const assetRef = ref(storage, `uploads/${asset.name}`);
+      try {
+        await deleteObject(assetRef);
+        alert('Asset deleted successfully');
+        navigate('/gallery');
+      } catch (error) {
+        console.error('Error deleting asset:', error);
+        alert('Error deleting asset');
+      }
+    } else {
+      alert('No tienes permiso para borrar este archivo.');
     }
   };
 
