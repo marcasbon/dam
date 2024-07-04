@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, updateMetadata } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
-import { Button, Slider } from '@mui/material';
+import { Slider, Select, MenuItem, TextField } from '@mui/material';
 import './UploadForm.css';
 
 const UploadForm = () => {
@@ -15,6 +15,8 @@ const UploadForm = () => {
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [downloadURL, setDownloadURL] = useState("");
+  const [category, setCategory] = useState('');
+  const [tags, setTags] = useState('');
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -95,9 +97,18 @@ const UploadForm = () => {
         setMessage(`Error: ${error.message}`);
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
           setDownloadURL(downloadURL);
           setMessage(`File uploaded successfully!`);
+
+          // Set metadata for category and tags
+          const metadata = {
+            customMetadata: {
+              category: category,
+              tags: tags,
+            },
+          };
+          await updateMetadata(storageRef, metadata);
         });
       }
     );
@@ -139,6 +150,23 @@ const UploadForm = () => {
           </div>
         </div>
       )}
+      <Select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        displayEmpty
+        inputProps={{ 'aria-label': 'Without label' }}
+      >
+        <MenuItem value=""><em>None</em></MenuItem>
+        <MenuItem value="Images">Images</MenuItem>
+        <MenuItem value="Videos">Videos</MenuItem>
+        <MenuItem value="Documents">Documents</MenuItem>
+      </Select>
+      <TextField
+        label="Tags"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        helperText="Comma separated tags"
+      />
       <button onClick={handleUpload}>Subir</button>
       <div className="progress">Progreso: {progress}%</div>
       {message && <p className="message">{message}</p>}

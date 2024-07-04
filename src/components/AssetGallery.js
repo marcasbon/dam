@@ -1,11 +1,12 @@
-// src/components/AssetGallery.js
 import React, { useEffect, useState } from 'react';
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
+import { Select, MenuItem } from '@mui/material';
 import './AssetGallery.css';
 
 const AssetGallery = ({ onSelectAsset }) => {
   const [assets, setAssets] = useState([]);
+  const [filter, setFilter] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,17 +17,22 @@ const AssetGallery = ({ onSelectAsset }) => {
 
       const assetPromises = res.items.map(async (itemRef) => {
         const url = await getDownloadURL(itemRef);
-        return { name: itemRef.name, url };
+        const metadata = await getMetadata(itemRef);
+        return {
+          name: itemRef.name,
+          url,
+          category: metadata.customMetadata?.category || 'Unknown',
+          tags: metadata.customMetadata?.tags ? metadata.customMetadata.tags.split(',') : []
+        };
       });
 
       const assetObjects = await Promise.all(assetPromises);
 
-      // Filtrar duplicados basados en el nombre del archivo
       const uniqueAssets = assetObjects.filter((asset, index, self) =>
         index === self.findIndex((t) => t.name === asset.name)
       );
 
-      setAssets(assetObjects);
+      setAssets(uniqueAssets);
     };
 
     fetchAssets();
@@ -34,7 +40,7 @@ const AssetGallery = ({ onSelectAsset }) => {
 
   const handleSelectAsset = (asset) => {
     onSelectAsset(asset);
-    navigate('/details');
+    navigate('/details', { state: { asset } });
   };
 
   const isImage = (fileName) => {
@@ -42,12 +48,25 @@ const AssetGallery = ({ onSelectAsset }) => {
     return ['jpg', 'jpeg', 'png', 'gif'].includes(extension);
   };
 
+  const filteredAssets = assets.filter(asset => !filter || asset.category === filter);
+
   return (
     <div>
-      <h1>Galeria de archivos</h1>
+      <h1>Galería de archivos</h1>
       <button onClick={() => navigate('/upload')}>Subir archivo</button>
+      <Select
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        displayEmpty
+        inputProps={{ 'aria-label': 'Without label' }}
+      >
+        <MenuItem value=""><em>All</em></MenuItem>
+        <MenuItem value="Images">Images</MenuItem>
+        <MenuItem value="Videos">Videos</MenuItem>
+        <MenuItem value="Documents">Documents</MenuItem>
+      </Select>
       <div className="gallery">
-        {assets.map((asset) => (
+        {filteredAssets.map((asset) => (
           <div key={asset.name} className="asset-item" onClick={() => handleSelectAsset(asset)}>
             {isImage(asset.name) ? (
               <img src={asset.url} alt={asset.name} />

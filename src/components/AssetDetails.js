@@ -1,12 +1,33 @@
-// src/components/AssetDetails.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getStorage, ref, deleteObject } from 'firebase/storage';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getStorage, ref, deleteObject, getMetadata } from 'firebase/storage';
 import './AssetDetails.css';
 
-const AssetDetails = ({ asset }) => {
+const AssetDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const asset = location.state?.asset;
   const storage = getStorage();
+  const [metadata, setMetadata] = React.useState({ category: 'Unknown', tags: [] });
+
+  React.useEffect(() => {
+    if (asset) {
+      const fetchMetadata = async () => {
+        const assetRef = ref(storage, `uploads/${asset.name}`);
+        const metadata = await getMetadata(assetRef);
+        setMetadata({
+          category: metadata.customMetadata?.category || 'Unknown',
+          tags: metadata.customMetadata?.tags ? metadata.customMetadata.tags.split(',') : []
+        });
+      };
+
+      fetchMetadata();
+    }
+  }, [asset, storage]);
+
+  if (!asset) {
+    return <div>No asset selected</div>;
+  }
 
   const handleDelete = async () => {
     const assetRef = ref(storage, `uploads/${asset.name}`);
@@ -24,6 +45,8 @@ const AssetDetails = ({ asset }) => {
     <div className="asset-details">
       <h1>Detalles del archivo</h1>
       <p>{asset.name}</p>
+      <p>Categoría: {metadata.category}</p>
+      <p>Etiquetas: {metadata.tags.join(', ')}</p>
       <button onClick={handleDelete}>Borrar</button>
       <button onClick={() => navigate('/gallery')}>Atras</button>
     </div>
