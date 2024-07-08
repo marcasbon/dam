@@ -69,8 +69,10 @@ const AssetGallery = ({ onSelectAsset }) => {
         {filteredAssets.map((asset) => (
           <div key={asset.name} className="asset-item" onClick={() => handleSelectAsset(asset)}>
             {isImage(asset.name) ? (
+              // Mostrar imagen si el archivo es una imagen
               <img src={asset.url} alt={asset.name} />
             ) : (
+              // Mostrar el nombre del archivo si no es una imagen
               <p>{asset.name}</p>
             )}
           </div>
